@@ -31,18 +31,42 @@ class FlowDataset():
         M = -H * R
         return M
 
+#     def __getitem__(self, index):
+#         pc1 = copy.deepcopy(self.data['pc1'][index])
+#         pc2 = copy.deepcopy(self.data['pc2_partial'][index])
+#         flow12 = copy.deepcopy(self.data['pc2'][index]-self.data['pc1'][index])
+#         vismask = copy.deepcopy(self.data['vismask'][index])
+
+#         permidx = np.random.permutation(pc1.shape[0])[:self.npoint]
+#         pc1 = pc1[permidx,:]
+#         flow12 = flow12[permidx,:]
+#         vismask = vismask[permidx]
+#         permidx2 = np.random.permutation(pc2.shape[0])[:self.npoint]
+#         pc2 = pc2[permidx2,:]
+
+#         # apply global motion
+#         R1 = self.generate_3d()
+#         R2 = np.eye(3)
+#         flow12 = np.matmul(np.matmul(pc1,R1),R2-np.eye(3))+np.matmul(np.matmul(flow12,R1),R2)
+#         pc1 = np.matmul(pc1,R1)
+#         pc2 = np.matmul(np.matmul(pc2,R1),R2)
+
+#         momasks = np.zeros((self.npoint, self.nmask))
+#         return pc1, pc2, flow12, vismask, momasks
+
     def __getitem__(self, index):
         pc1 = copy.deepcopy(self.data['pc1'][index])
-        pc2 = copy.deepcopy(self.data['pc2_partial'][index])
+        pc2 = copy.deepcopy(self.data['pc2'][index])
+        
         flow12 = copy.deepcopy(self.data['pc2'][index]-self.data['pc1'][index])
         vismask = copy.deepcopy(self.data['vismask'][index])
 
-        permidx = np.random.permutation(pc1.shape[0])[:self.npoint]
-        pc1 = pc1[permidx,:]
-        flow12 = flow12[permidx,:]
-        vismask = vismask[permidx]
-        permidx2 = np.random.permutation(pc2.shape[0])[:self.npoint]
-        pc2 = pc2[permidx2,:]
+#         permidx = np.random.permutation(pc1.shape[0])[:self.npoint]
+#         pc1 = pc1[permidx,:]
+#         flow12 = flow12[permidx,:]
+#         vismask = vismask[permidx]
+#         permidx2 = np.random.permutation(pc2.shape[0])[:self.npoint]
+#         pc2 = pc2[permidx2,:]
 
         # apply global motion
         R1 = self.generate_3d()
@@ -53,6 +77,7 @@ class FlowDataset():
 
         momasks = np.zeros((self.npoint, self.nmask))
         return pc1, pc2, flow12, vismask, momasks
+
 
     def __len__(self):
         return self.data['pc1'].shape[0]
