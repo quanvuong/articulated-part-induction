@@ -79,7 +79,7 @@ def get_learning_rate(batch):
                         DECAY_RATE,          # Decay rate.
                         staircase=True)
     learning_rate = tf.maximum(learning_rate, 0.00001) # CLIP THE LEARNING RATE!
-    return learning_rate        
+    return learning_rate
 
 def get_bn_decay(batch):
     bn_momentum = tf.train.exponential_decay(
@@ -97,8 +97,8 @@ def train():
             pcpair_pl, flow_pl, vismask_pl, momasks_pl = MODEL.placeholder_inputs(NMASK, NPOINT)
             is_training_pl = tf.placeholder(tf.bool, shape=())
             print(is_training_pl)
-            
-            # Note the global_step=batch parameter to minimize. 
+
+            # Note the global_step=batch parameter to minimize.
             # That tells the optimizer to helpfully increment the 'batch' parameter for you every time it trains.
             batch = tf.Variable(0)
             bn_decay = get_bn_decay(batch)
@@ -128,7 +128,7 @@ def train():
             elif OPTIMIZER == 'adam':
                 optimizer = tf.train.AdamOptimizer(learning_rate)
             train_op = optimizer.minimize(loss, global_step=batch)
-            
+
             # Add ops to save and restore all the variables.
             saver = tf.train.Saver()
             if STAGE>2:
@@ -136,7 +136,7 @@ def train():
                     tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, scope='CorrsFlowNet'))
                 saver_transgrouping = tf.train.Saver(var_list=tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, scope='TransNet')+
                     tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, scope='GroupingNet'))
-        
+
         # Create a session
         config = tf.ConfigProto()
         config.gpu_options.allow_growth = True
@@ -173,7 +173,7 @@ def train():
         for epoch in range(MAX_EPOCH):
             log_string('**** EPOCH %03d ****' % (epoch))
             sys.stdout.flush()
-            
+
             train_one_epoch(sess, ops, train_writer)
             loss = eval_one_epoch(sess, ops, test_writer)
             if loss < best_loss:
@@ -205,7 +205,7 @@ def train_one_epoch(sess, ops, train_writer):
     """ ops: dict mapping from string to tf ops """
     global EPOCH_CNT
     is_training = True
-    
+
     # Shuffle train samples
     train_idxs = np.arange(0, len(TRAIN_DATASET))
     np.random.shuffle(train_idxs)
@@ -214,7 +214,7 @@ def train_one_epoch(sess, ops, train_writer):
     loss1_sum = 0
     loss2_sum = 0
     loss3_sum = 0
-    
+
     log_string(str(datetime.now()))
     for batch_idx in range(num_batches):
         # Get batch data
@@ -249,7 +249,7 @@ def train_one_epoch(sess, ops, train_writer):
             loss2_sum = 0
             loss3_sum = 0
 
-        
+
 def eval_one_epoch(sess, ops, test_writer):
     """ ops: dict mapping from string to tf ops """
     global EPOCH_CNT
@@ -261,10 +261,10 @@ def eval_one_epoch(sess, ops, test_writer):
     loss1_sum = 0
     loss2_sum = 0
     loss3_sum = 0
-    
+
     log_string(str(datetime.now()))
     log_string('---- EPOCH %03d EVALUATION ----'%(EPOCH_CNT))
-    
+
     for batch_idx in range(num_batches):
         start_idx = batch_idx * BATCH_SIZE
         end_idx = (batch_idx+1) * BATCH_SIZE
@@ -286,13 +286,13 @@ def eval_one_epoch(sess, ops, test_writer):
     EPOCH_CNT += 1
 
     if STAGE==1:
-        log_string('eval mean loss: %f, eval mean loss_flow: %f, eval mean loss_vismask: %f, eval mean loss_matching: %f' % (loss_sum / float(num_batches), loss1_sum / float(num_batches), loss2_sum / float(num_batches), loss3_sum / float(num_batches))) 
+        log_string('eval mean loss: %f, eval mean loss_flow: %f, eval mean loss_vismask: %f, eval mean loss_matching: %f' % (loss_sum / float(num_batches), loss1_sum / float(num_batches), loss2_sum / float(num_batches), loss3_sum / float(num_batches)))
         return loss1_sum / float(num_batches)
     elif STAGE==2:
-        log_string('eval mean loss: %f, eval mean loss_trans: %f, eval mean loss_grouping: %f' % (loss_sum / float(num_batches), loss1_sum / float(num_batches), loss2_sum / float(num_batches))) 
+        log_string('eval mean loss: %f, eval mean loss_trans: %f, eval mean loss_grouping: %f' % (loss_sum / float(num_batches), loss1_sum / float(num_batches), loss2_sum / float(num_batches)))
         return loss_sum / float(num_batches)
     else:
-        log_string('eval mean loss: %f, eval mean negative iou: %f, eval mean loss_seg: %f' % (loss_sum / float(num_batches), loss2_sum / float(num_batches), loss1_sum / float(num_batches))) 
+        log_string('eval mean loss: %f, eval mean negative iou: %f, eval mean loss_seg: %f' % (loss_sum / float(num_batches), loss2_sum / float(num_batches), loss1_sum / float(num_batches)))
         return loss_sum / float(num_batches)
 
 
