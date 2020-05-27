@@ -105,3 +105,6 @@ venv.bak/
 
 data
 .vscode
+
+shaper_saved_predictions
+results
